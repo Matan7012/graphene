@@ -52,16 +52,16 @@ def filter_and_smooth(grayimage):
     return close
 
 
-def filter_gray(src, background):
+def filter_background(src, background):
     hsv_color1 = np.asarray(background - 2)  # light purple
     hsv_color2 = np.asarray(background + 2)  # dark purple
     gray_image = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
     mask = cv2.inRange(gray_image, hsv_color1, hsv_color2)
     median = cv2.medianBlur(mask, 5)
-    image_without_background = abs(255 - median)
-    filterd_image = filter_and_smooth(image_without_background)
+    filterd_image = filter_and_smooth(median)
 
     plt.imshow(filterd_image)
+    plt.title("find background")
     plt.show()
     return filterd_image
 
@@ -76,15 +76,16 @@ def filter_rgb(src, background):
     blue_channel = src[:, :, 0]
     green_channel = src[:, :, 1]
     red_channel = src[:, :, 2]
-    threshold=[10,10,10]
-    hsv_color1 = np.asarray(np.array(background) -np.array(threshold))
-    hsv_color2 = np.asarray(np.array(background) +np.array(threshold))
+    threshold = [10, 10, 10]
+    hsv_color1 = np.asarray(np.array(background) - np.array(threshold))
+    hsv_color2 = np.asarray(np.array(background) + np.array(threshold))
     background_image = cv2.inRange(src, hsv_color1, hsv_color2)
     median = cv2.medianBlur(background_image, 5)
     # image_without_background = abs(255 - median)
     # print(image_without_background)
     # filterd_image = filter_and_smooth(median)
     plt.imshow(median)
+    plt.title("find flakes")
     plt.show()
     return median
 
@@ -176,13 +177,13 @@ if __name__ == '__main__':
     plt.imshow(bgr2rgb(src))
     plt.show()
     value_of_background_bgr = histogramrgb(path)
-    image_filterd_from_flake=filter_rgb(src, value_of_background_bgr)
-    filterd_image = filter_gray(src, value_of_background_grayscale)
+    image_filterd_from_flake = filter_rgb(src, value_of_background_bgr)
+    filterd_image = filter_background(src, value_of_background_grayscale)
     #
     # image_without_background=src*filterd_image
     for row in range(len(image_filterd_from_flake)):
         for colum in range(len(image_filterd_from_flake[row])):
-            if image_filterd_from_flake[row][colum] == 0 or filterd_image[row][colum]==0:
+            if image_filterd_from_flake[row][colum] == 0 or filterd_image[row][colum] == 255:
                 src[row][colum] = [0, 0, 0]
 
     plt.imshow(bgr2rgb(src))
