@@ -52,16 +52,17 @@ def filter_and_smooth(grayimage):
     return close
 
 
-def filter_background(src, background):
-    hsv_color1 = np.asarray(background - 2)  # light purple
-    hsv_color2 = np.asarray(background + 2)  # dark purple
+def filter_gray(src, background):
+    threshold=1
+    hsv_color1 = np.asarray(background - threshold)  # light purple
+    hsv_color2 = np.asarray(background + threshold)  # dark purple
     gray_image = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
     mask = cv2.inRange(gray_image, hsv_color1, hsv_color2)
     median = cv2.medianBlur(mask, 5)
     filterd_image = filter_and_smooth(median)
 
     plt.imshow(filterd_image)
-    plt.title("find background")
+    plt.title("find flakes")
     plt.show()
     return filterd_image
 
@@ -85,7 +86,7 @@ def filter_rgb(src, background):
     # print(image_without_background)
     # filterd_image = filter_and_smooth(median)
     plt.imshow(median)
-    plt.title("find flakes")
+    plt.title("find background_image")
     plt.show()
     return median
 
@@ -171,14 +172,14 @@ def edge_detiction(path):
 
 
 if __name__ == '__main__':
-    path = 'C:\\Users\\Owner\\PycharmProjects\\graphene\\try_photo.tif'
+    path = 'C:\\Users\\Owner\\PycharmProjects\\graphene\\tryphot03.tif'
     value_of_background_grayscale = histogramgray(path)
     src = cv2.imread(path)
     plt.imshow(bgr2rgb(src))
     plt.show()
     value_of_background_bgr = histogramrgb(path)
     image_filterd_from_flake = filter_rgb(src, value_of_background_bgr)
-    filterd_image = filter_background(src, value_of_background_grayscale)
+    filterd_image = filter_gray(src, value_of_background_grayscale)
     #
     # image_without_background=src*filterd_image
     for row in range(len(image_filterd_from_flake)):
